@@ -1,0 +1,6 @@
+apiVersion: crank.crossplane.io/v1alpha1
+kind: Package
+metadata:
+  name: crank-base
+spec:
+  package: registry.hub.docker.com/hasheddan/crank

@@ -1,0 +1,143 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.2.4
+  creationTimestamp: null
+  name: packages.crank.crossplane.io
+spec:
+  additionalPrinterColumns:
+  - JSONPath: .status.conditionedStatus.conditions[?(@.type=='Ready')].status
+    name: READY
+    type: string
+  - JSONPath: .spec.source
+    name: SOURCE
+    type: string
+  - JSONPath: .spec.package
+    name: PACKAGE
+    type: string
+  - JSONPath: .metadata.creationTimestamp
+    name: AGE
+    type: date
+  group: crank.crossplane.io
+  names:
+    categories:
+    - crossplane
+    kind: Package
+    listKind: PackageList
+    plural: packages
+    singular: package
+  scope: Cluster
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      description: Package is the CRD type for a request to add a package to Crossplane.
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: PackageSpec specifies details about a request to install a
+            package to Crossplane.
+          properties:
+            imagePullPolicy:
+              description: ImagePullPolicy defines the pull policy for all images
+                used during Package extraction and when running the Package controller.
+                https://kubernetes.io/docs/concepts/configuration/overview/#container-images
+              type: string
+            imagePullSecrets:
+              description: ImagePullSecrets are named secrets in the same workspace
+                that can be used to fetch Packages from private repositories and to
+                run controllers from private repositories
+              items:
+                description: LocalObjectReference contains enough information to let
+                  you locate the referenced object inside the same namespace.
+                properties:
+                  name:
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
+                    type: string
+                type: object
+              type: array
+            package:
+              description: Package is the name of the package that is being requested,
+                e.g., myapp. Either Package or CustomResourceDefinition can be specified.
+              type: string
+            serviceAccount:
+              description: ServiceAccount options allow for changes to the ServiceAccount
+                the Package Manager creates for the PackageRevision's controller
+              properties:
+                annotations:
+                  additionalProperties:
+                    type: string
+                  type: object
+              type: object
+          type: object
+        status:
+          description: PackageStatus represents the observed state of a Package.
+          properties:
+            conditionedStatus:
+              description: A ConditionedStatus reflects the observed status of a resource.
+                Only one condition of each type may exist.
+              properties:
+                conditions:
+                  description: Conditions of the resource.
+                  items:
+                    description: A Condition that may apply to a resource.
+                    properties:
+                      lastTransitionTime:
+                        description: LastTransitionTime is the last time this condition
+                          transitioned from one status to another.
+                        format: date-time
+                        type: string
+                      message:
+                        description: A Message containing details about this condition's
+                          last transition from one status to another, if any.
+                        type: string
+                      reason:
+                        description: A Reason for this condition's last transition
+                          from one status to another.
+                        type: string
+                      status:
+                        description: Status of this condition; is it currently True,
+                          False, or Unknown?
+                        type: string
+                      type:
+                        description: Type of this condition. At most one of each condition
+                          type may apply to a resource at any point in time.
+                        type: string
+                    required:
+                    - lastTransitionTime
+                    - reason
+                    - status
+                    - type
+                    type: object
+                  type: array
+              type: object
+            currentRevision:
+              type: string
+          type: object
+      type: object
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
