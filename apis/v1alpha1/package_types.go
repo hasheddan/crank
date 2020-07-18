@@ -26,7 +26,6 @@ import (
 // +kubebuilder:object:root=true
 
 // Package is the CRD type for a request to add a package to Crossplane.
-// +kubebuilder:resource:categories=crossplane
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="READY",type="string",JSONPath=".status.conditionedStatus.conditions[?(@.type=='Ready')].status"
 // +kubebuilder:printcolumn:name="SOURCE",type="string",JSONPath=".spec.source"

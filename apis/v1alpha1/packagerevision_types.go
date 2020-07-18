@@ -39,7 +39,6 @@ const (
 // +kubebuilder:object:root=true
 
 // A PackageRevision that has been added to Crossplane.
-// +kubebuilder:resource:categories=crossplane
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="READY",type="string",JSONPath=".status.conditionedStatus.conditions[?(@.type=='Ready')].status"
 // +kubebuilder:printcolumn:name="VERSION",type="string",JSONPath=".spec.version"

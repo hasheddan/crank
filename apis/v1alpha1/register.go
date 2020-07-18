@@ -53,7 +53,16 @@ var (
 	PackageRevisionGroupVersionKind = SchemeGroupVersion.WithKind(PackageRevisionKind)
 )
 
+// Module type metadata.
+var (
+	ModuleKind             = reflect.TypeOf(Module{}).Name()
+	ModuleGroupKind        = schema.GroupKind{Group: Group, Kind: ModuleKind}.String()
+	ModuleKindAPIVersion   = ModuleKind + "." + SchemeGroupVersion.String()
+	ModuleGroupVersionKind = SchemeGroupVersion.WithKind(ModuleKind)
+)
+
 func init() {
 	SchemeBuilder.Register(&Package{}, &PackageList{})
 	SchemeBuilder.Register(&PackageRevision{}, &PackageRevisionList{})
+	SchemeBuilder.Register(&Module{}, &ModuleList{})
 }
