@@ -14,24 +14,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package controller
+package dag
 
 import (
-	ctrl "sigs.k8s.io/controller-runtime"
+	"fmt"
+	"testing"
 
-	"github.com/crossplane/crossplane-runtime/pkg/logging"
-
-	"github.com/hasheddan/crank/pkg/controller/manager"
+	"github.com/google/go-cmp/cmp"
 )
 
-// Setup workload controllers.
-func Setup(mgr ctrl.Manager, l logging.Logger) error {
-	for _, setup := range []func(ctrl.Manager, logging.Logger) error{
-		manager.Setup,
-	} {
-		if err := setup(mgr, l); err != nil {
-			return err
-		}
+func TestSort(t *testing.T) {
+	dag := New()
+	if err := dag.AddNodes("A", "B", "C"); err != nil {
+		t.Fatalf("cannot add node: %s", err)
 	}
-	return nil
+	fmt.Println(dag.nodes)
+	if err := dag.AddEdges(map[string][]string{"A": {"B", "C"}, "B": {"C"}}); err != nil {
+		t.Fatalf("cannot add edges: %s", err)
+	}
+	res, err := dag.Sort()
+	if err != nil {
+		t.Fatalf("got error %s", err)
+	}
+	fmt.Println(res)
+	if !cmp.Equal(res, []string{"C", "B", "A"}) {
+		t.Fatalf("wrong order: %v", res)
+	}
 }
