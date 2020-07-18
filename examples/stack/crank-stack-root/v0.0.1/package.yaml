@@ -1,6 +1,6 @@
 apiVersion: crank.crossplane.io/v1alpha1
 kind: Package
 metadata:
-  name: crank-base
+  name: crank-stack-root
 spec:
-  package: registry.hub.docker.com/hasheddan/crank
+  package: hasheddan/crank-stack-root:v0.0.1

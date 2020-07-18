@@ -1,4 +1,4 @@
-title: "Crank Base"
+title: "Crank Root"
 # overviewShort:
 # overview:
 # readme:
@@ -21,14 +21,15 @@ packageType: Stack
 
 # Keywords that describe this application and help search indexing
 keywords:
-- "base"
+- "root"
 
 # Links to more information about the application (about page, source code, etc.)
 website: "https://upbound.io"
 source: "https://github.com/hasheddan/crank"
 
 dependsOn:
-- package: "registry.upbound.io/crossplane/provider-aws:~v0.9.0"
+- package: "hasheddan/crank-stack-intermediate-one:v0.0.1"
+- package: "hasheddan/crank-stack-intermediate-two:v0.0.1"
 
 # License SPDX name: https://spdx.org/licenses/
 license: Apache-2.0

@@ -1,0 +1,19 @@
+apiVersion: crank.crossplane.io/v1alpha1
+kind: Module
+metadata:
+  name: packages
+spec:
+  packages:
+  - name: test-1
+    image: test-1-image
+    dependencies:
+    - test-2-image
+    - test-3-image
+  - name: test-2
+    image: test-2-image
+    dependencies:
+    - test-3-image
+  - name: test-3
+    image: test-3-image
+    dependencies:
+    - test-2-image

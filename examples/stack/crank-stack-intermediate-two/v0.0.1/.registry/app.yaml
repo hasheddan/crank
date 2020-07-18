@@ -1,0 +1,34 @@
+title: "Crank Intermediate Two"
+# overviewShort:
+# overview:
+# readme:
+
+# Maintainer names and emails.
+maintainers:
+- name: Daniel Mangum
+  email: dan@upbound.io
+
+# Owner names and emails.
+owners:
+- name: Daniel Mangum
+  email: dan@upbound.io
+
+# Human readable company name.
+company: Crossplane
+
+# Type of package: Provider or Stack
+packageType: Stack
+
+# Keywords that describe this application and help search indexing
+keywords:
+- "intermediate"
+
+# Links to more information about the application (about page, source code, etc.)
+website: "https://upbound.io"
+source: "https://github.com/hasheddan/crank"
+
+# dependsOn:
+# - package: "registry.hub.docker.com/hasheddan/crank-stack-intermediate-one:v0.*"
+
+# License SPDX name: https://spdx.org/licenses/
+license: Apache-2.0

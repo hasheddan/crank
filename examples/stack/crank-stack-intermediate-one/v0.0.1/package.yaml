@@ -1,0 +1,6 @@
+apiVersion: crank.crossplane.io/v1alpha1
+kind: Package
+metadata:
+  name: hasheddan-crank-stack-intermediate-one
+spec:
+  package: hasheddan/crank-stack-intermediate-one:v0.0.1
