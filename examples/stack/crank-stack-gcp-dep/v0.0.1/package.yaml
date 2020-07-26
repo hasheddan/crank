@@ -1,0 +1,6 @@
+apiVersion: crank.crossplane.io/v1alpha1
+kind: Package
+metadata:
+  name: hasheddan-crank-stack-gcp-dep
+spec:
+  package: hasheddan/crank-stack-gcp-dep:v0.0.1
