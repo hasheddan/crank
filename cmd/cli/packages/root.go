@@ -14,30 +14,33 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package cmd
+package packages
 
 import (
-	"github.com/hasheddan/crank/cmd/cli"
-	"github.com/hasheddan/crank/cmd/cli/packages"
-	"github.com/hasheddan/crank/cmd/manager"
 	"github.com/spf13/cobra"
 )
 
-var (
-	rootCmd = &cobra.Command{
-		Use:   "crank",
-		Short: "The next generation package manager for Crossplane",
-		Long:  `The next generation package manager for Crossplane`,
-	}
+// Output colors.
+const (
+	InfoColor    = "\033[1;34m%s\033[0m\n"
+	NoticeColor  = "\033[1;36m%s\033[0m\n"
+	WarningColor = "\033[1;33m%s\033[0m\n"
+	ErrorColor   = "\033[1;31m%s\033[0m\n"
+	DebugColor   = "\033[0;36m%s\033[0m\n"
 )
+
+// Root will list all installed Crossplane package.
+var Root = &cobra.Command{
+	Use:   "packages",
+	Short: "Interact with Crossplane packages",
+}
 
 // Execute executes the root command.
 func Execute() error {
-	return rootCmd.Execute()
+	return Root.Execute()
 }
 
 func init() {
-	rootCmd.AddCommand(manager.Root)
-	rootCmd.AddCommand(cli.Lint)
-	rootCmd.AddCommand(packages.Root)
+	Root.AddCommand(list)
+	Root.AddCommand(revisions)
 }

@@ -3,6 +3,7 @@ module github.com/hasheddan/crank
 go 1.13
 
 require (
+	github.com/crossplane/crossplane v0.12.0
 	github.com/crossplane/crossplane-runtime v0.9.0
 	github.com/crossplane/crossplane-tools v0.0.0-20200412230150-efd0edd4565b
 	github.com/ghodss/yaml v1.0.0
