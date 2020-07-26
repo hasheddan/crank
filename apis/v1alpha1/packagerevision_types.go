@@ -41,7 +41,8 @@ const (
 // A PackageRevision that has been added to Crossplane.
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="READY",type="string",JSONPath=".status.conditionedStatus.conditions[?(@.type=='Ready')].status"
-// +kubebuilder:printcolumn:name="VERSION",type="string",JSONPath=".spec.version"
+// +kubebuilder:printcolumn:name="IMAGE",type="string",JSONPath=".spec.image"
+// +kubebuilder:printcolumn:name="STATE",type="string",JSONPath=".spec.desiredState"
 // +kubebuilder:printcolumn:name="AGE",type="date",JSONPath=".metadata.creationTimestamp"
 // +kubebuilder:resource:scope=Cluster,categories={crossplane}
 type PackageRevision struct {
@@ -61,6 +62,7 @@ type PackageRevisionSpec struct {
 	Controller                 ControllerSpec              `json:"controller,omitempty"`
 	InstallJobRef              *corev1.ObjectReference     `json:"installJobRef,omitempty"`
 	DesiredState               PackageRevisionDesiredState `json:"desiredState"`
+	Image                      string                      `json:"image"`
 	Revision                   int64                       `json:"revision"`
 	// DependsOn is the list of packages and CRDs that this package depends on.
 	DependsOn []Dependency `json:"dependsOn,omitempty"`
