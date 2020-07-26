@@ -22,12 +22,14 @@ import (
 	"github.com/crossplane/crossplane-runtime/pkg/logging"
 
 	"github.com/hasheddan/crank/pkg/controller/manager"
+	"github.com/hasheddan/crank/pkg/controller/packagerevision"
 )
 
 // Setup workload controllers.
 func Setup(mgr ctrl.Manager, l logging.Logger) error {
 	for _, setup := range []func(ctrl.Manager, logging.Logger) error{
 		manager.Setup,
+		packagerevision.Setup,
 	} {
 		if err := setup(mgr, l); err != nil {
 			return err
