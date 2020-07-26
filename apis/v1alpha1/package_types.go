@@ -47,7 +47,7 @@ type PackageSpec struct {
 
 	// Package is the name of the package that is being requested, e.g.,
 	// myapp. Either Package or CustomResourceDefinition can be specified.
-	Package string `json:"package,omitempty"`
+	Package string `json:"package"`
 }
 
 // PackageControllerOptions allow for changes in the Package extraction and
