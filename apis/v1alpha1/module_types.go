@@ -35,9 +35,9 @@ type Module struct {
 // ModuleSpec specifies details about a request to install a package to
 // Crossplane.
 type ModuleSpec struct {
-	Packages                  []PackageDependencies `json:"packages,omitempty"`
-	Compositions              map[string]string     `json:"compositions,omitempty"`
-	CustomResourceDefinitions map[string]string     `json:"crds,omitempty"`
+	Packages                  map[string]PackageDependencies `json:"packages"`
+	Compositions              map[string]string              `json:"compositions,omitempty"`
+	CustomResourceDefinitions map[string]string              `json:"crds,omitempty"`
 }
 
 // PackageDependencies identifies the dependencies of a package.

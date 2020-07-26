@@ -161,9 +161,9 @@ func (in *ModuleSpec) DeepCopyInto(out *ModuleSpec) {
 	*out = *in
 	if in.Packages != nil {
 		in, out := &in.Packages, &out.Packages
-		*out = make([]PackageDependencies, len(*in))
-		for i := range *in {
-			(*in)[i].DeepCopyInto(&(*out)[i])
+		*out = make(map[string]PackageDependencies, len(*in))
+		for key, val := range *in {
+			(*out)[key] = *val.DeepCopy()
 		}
 	}
 	if in.Compositions != nil {
