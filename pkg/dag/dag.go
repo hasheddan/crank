@@ -18,7 +18,9 @@ package dag
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/hasheddan/crank/apis/v1alpha1"
 	"github.com/pkg/errors"
 )
 
@@ -28,8 +30,19 @@ type Dag struct {
 }
 
 // New returns a new Dag.
-func New() *Dag {
-	return &Dag{map[string][]string{}}
+func New(deps map[string]v1alpha1.PackageDependencies) (*Dag, error) {
+	d := &Dag{map[string][]string{}}
+	for _, pkg := range deps {
+		if err := d.AddNode(strings.Split(pkg.Image, ":")[0]); err != nil {
+			return nil, err
+		}
+	}
+	for _, pkg := range deps {
+		if err := d.AddEdges(map[string][]string{strings.Split(pkg.Image, ":")[0]: pkg.Dependencies}); err != nil {
+			return nil, err
+		}
+	}
+	return d, nil
 }
 
 // AddNodes adds nodes to the graph.
@@ -51,6 +64,14 @@ func (d *Dag) AddNode(name string) error {
 	return nil
 }
 
+// NodeExists checks whether a node exists.
+func (d *Dag) NodeExists(name string) bool {
+	if _, ok := d.nodes[name]; !ok {
+		return false
+	}
+	return true
+}
+
 // AddEdges adds edges to the graph.
 func (d *Dag) AddEdges(edges map[string][]string) error {
 	for f, ne := range edges {
@@ -66,10 +87,10 @@ func (d *Dag) AddEdges(edges map[string][]string) error {
 // AddEdge adds an edge to the graph.
 func (d *Dag) AddEdge(from, to string) error {
 	if _, ok := d.nodes[from]; !ok {
-		return errors.New("from node does not exist")
+		return errors.New(fmt.Sprintf("from node %s does not exist", from))
 	}
 	if _, ok := d.nodes[to]; !ok {
-		return errors.New("to node does not exist")
+		return errors.New(fmt.Sprintf("to node %s does not exist", to))
 	}
 	d.nodes[from] = append(d.nodes[from], to)
 	return nil

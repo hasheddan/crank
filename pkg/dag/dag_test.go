@@ -24,7 +24,7 @@ import (
 )
 
 func TestSort(t *testing.T) {
-	dag := New()
+	dag := &Dag{map[string][]string{}}
 	if err := dag.AddNodes("A", "B", "C"); err != nil {
 		t.Fatalf("cannot add node: %s", err)
 	}
@@ -36,7 +36,6 @@ func TestSort(t *testing.T) {
 	if err != nil {
 		t.Fatalf("got error %s", err)
 	}
-	fmt.Println(res)
 	if !cmp.Equal(res, []string{"C", "B", "A"}) {
 		t.Fatalf("wrong order: %v", res)
 	}
