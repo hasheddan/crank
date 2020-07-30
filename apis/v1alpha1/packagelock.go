@@ -22,19 +22,19 @@ import (
 
 // +kubebuilder:object:root=true
 
-// Module is the CRD type for a request to add a package to Crossplane.
+// PackageLock is the CRD type for a request to add a package to Crossplane.
 // +kubebuilder:printcolumn:name="AGE",type="date",JSONPath=".metadata.creationTimestamp"
 // +kubebuilder:resource:scope=Cluster,categories={crossplane}
-type Module struct {
+type PackageLock struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec ModuleSpec `json:"spec,omitempty"`
+	Spec PackageLockSpec `json:"spec,omitempty"`
 }
 
-// ModuleSpec specifies details about a request to install a package to
+// PackageLockSpec specifies details about a request to install a package to
 // Crossplane.
-type ModuleSpec struct {
+type PackageLockSpec struct {
 	Packages                  map[string]PackageDependencies `json:"packages"`
 	Compositions              map[string]string              `json:"compositions,omitempty"`
 	CustomResourceDefinitions map[string]string              `json:"crds,omitempty"`
@@ -49,9 +49,9 @@ type PackageDependencies struct {
 
 // +kubebuilder:object:root=true
 
-// ModuleList contains a list of Module.
-type ModuleList struct {
+// PackageLockList contains a list of PackageLock.
+type PackageLockList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Module `json:"items"`
+	Items           []PackageLock `json:"items"`
 }

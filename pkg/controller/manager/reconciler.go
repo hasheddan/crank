@@ -89,13 +89,13 @@ func (r *Reconciler) Reconcile(req reconcile.Request) (reconcile.Result, error) 
 		return reconcile.Result{}, errors.Wrap(resource.IgnoreNotFound(err), "cannot get Package")
 	}
 
-	m := &v1alpha1.Module{}
+	m := &v1alpha1.PackageLock{}
 	if err := r.client.Get(ctx, types.NamespacedName{Name: "packages"}, m); err != nil {
-		log.Debug("Cannot get package module", "error", err)
-		return reconcile.Result{}, errors.Wrap(resource.IgnoreNotFound(err), "cannot get Module")
+		log.Debug("Cannot get package package lock", "error", err)
+		return reconcile.Result{}, errors.Wrap(resource.IgnoreNotFound(err), "cannot get PackageLock")
 	}
 
-	// Construct DAG for Module.
+	// Construct DAG for PackageLock.
 	d, err := dag.New(m.Spec.Packages)
 	if err != nil {
 		p.Status.SetConditions(runtimev1alpha1.Unavailable(), runtimev1alpha1.ReconcileSuccess())
@@ -133,7 +133,7 @@ func (r *Reconciler) Reconcile(req reconcile.Request) (reconcile.Result, error) 
 			r.record.Event(p, event.Warning(event.Reason("cyclical dependency"), err))
 			return reconcile.Result{RequeueAfter: aShortWait}, errors.Wrap(r.client.Status().Update(ctx, p), "cannot update package status")
 		}
-		// Append the package to the Module and attempt to update.
+		// Append the package to the PackageLock and attempt to update.
 		if m.Spec.Packages == nil {
 			m.Spec.Packages = map[string]v1alpha1.PackageDependencies{}
 		}
@@ -142,14 +142,14 @@ func (r *Reconciler) Reconcile(req reconcile.Request) (reconcile.Result, error) 
 			Image:        p.Spec.Package,
 			Dependencies: deps,
 		}
-		// If another package has updated the Module since we read it then this will
+		// If another package has updated the PackageLock since we read it then this will
 		// fail. Try again after short wait.
 		if err := r.client.Update(ctx, m); err != nil {
-			log.Debug("Cannot update package module", "error", err)
-			return reconcile.Result{RequeueAfter: aShortWait}, errors.Wrap(err, "cannot update Module")
+			log.Debug("Cannot update package package lock", "error", err)
+			return reconcile.Result{RequeueAfter: aShortWait}, errors.Wrap(err, "cannot update PackageLock")
 		}
 	}
-	// If updating the Module was successful then we can create PackageRevision safely.
+	// If updating the PackageLock was successful then we can create PackageRevision safely.
 	pr := &v1alpha1.PackageRevision{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:   digest,

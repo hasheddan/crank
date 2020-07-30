@@ -48,7 +48,7 @@ var list = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
-		m := &v1alpha1.Module{}
+		m := &v1alpha1.PackageLock{}
 		if err := c.Get(context.TODO(), types.NamespacedName{Name: "packages"}, m); err != nil {
 			panic(err)
 		}

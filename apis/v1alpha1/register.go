@@ -53,16 +53,16 @@ var (
 	PackageRevisionGroupVersionKind = SchemeGroupVersion.WithKind(PackageRevisionKind)
 )
 
-// Module type metadata.
+// PackageLock type metadata.
 var (
-	ModuleKind             = reflect.TypeOf(Module{}).Name()
-	ModuleGroupKind        = schema.GroupKind{Group: Group, Kind: ModuleKind}.String()
-	ModuleKindAPIVersion   = ModuleKind + "." + SchemeGroupVersion.String()
-	ModuleGroupVersionKind = SchemeGroupVersion.WithKind(ModuleKind)
+	PackageLockKind             = reflect.TypeOf(PackageLock{}).Name()
+	PackageLockGroupKind        = schema.GroupKind{Group: Group, Kind: PackageLockKind}.String()
+	PackageLockKindAPIVersion   = PackageLockKind + "." + SchemeGroupVersion.String()
+	PackageLockGroupVersionKind = SchemeGroupVersion.WithKind(PackageLockKind)
 )
 
 func init() {
 	SchemeBuilder.Register(&Package{}, &PackageList{})
 	SchemeBuilder.Register(&PackageRevision{}, &PackageRevisionList{})
-	SchemeBuilder.Register(&Module{}, &ModuleList{})
+	SchemeBuilder.Register(&PackageLock{}, &PackageLockList{})
 }
