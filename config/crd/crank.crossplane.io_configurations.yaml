@@ -6,14 +6,11 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.2.4
   creationTimestamp: null
-  name: packages.crank.crossplane.io
+  name: configurations.crank.crossplane.io
 spec:
   additionalPrinterColumns:
   - JSONPath: .status.conditionedStatus.conditions[?(@.type=='Ready')].status
     name: READY
-    type: string
-  - JSONPath: .spec.source
-    name: SOURCE
     type: string
   - JSONPath: .spec.package
     name: PACKAGE
@@ -25,16 +22,16 @@ spec:
   names:
     categories:
     - crossplane
-    kind: Package
-    listKind: PackageList
-    plural: packages
-    singular: package
+    kind: Configuration
+    listKind: ConfigurationList
+    plural: configurations
+    singular: configuration
   scope: Cluster
   subresources:
     status: {}
   validation:
     openAPIV3Schema:
-      description: Package is the CRD type for a request to add a package to Crossplane.
+      description: Configuration is the CRD type for a request to add a configuration to Crossplane.
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
@@ -45,13 +42,13 @@ spec:
         metadata:
           type: object
         spec:
-          description: PackageSpec specifies details about a request to install a package to Crossplane.
+          description: ConfigurationSpec specifies details about a request to install a configuration to Crossplane.
           properties:
             imagePullPolicy:
-              description: ImagePullPolicy defines the pull policy for all images used during Package extraction and when running the Package controller. https://kubernetes.io/docs/concepts/configuration/overview/#container-images
+              description: ImagePullPolicy defines the pull policy for all images used during Provider extraction and when running the Provider controller. https://kubernetes.io/docs/concepts/configuration/overview/#container-images
               type: string
             imagePullSecrets:
-              description: ImagePullSecrets are named secrets in the same workspace that can be used to fetch Packages from private repositories and to run controllers from private repositories
+              description: ImagePullSecrets are named secrets in the same workspace that can be used to fetch Providers from private repositories and to run controllers from private repositories
               items:
                 description: LocalObjectReference contains enough information to let you locate the referenced object inside the same namespace.
                 properties:
@@ -63,19 +60,11 @@ spec:
             package:
               description: Package is the name of the package that is being requested, e.g., myapp. Either Package or CustomResourceDefinition can be specified.
               type: string
-            serviceAccount:
-              description: ServiceAccount options allow for changes to the ServiceAccount the Package Manager creates for the PackageRevision's controller
-              properties:
-                annotations:
-                  additionalProperties:
-                    type: string
-                  type: object
-              type: object
           required:
           - package
           type: object
         status:
-          description: PackageStatus represents the observed state of a Package.
+          description: ConfigurationStatus represents the observed state of a Configuration.
           properties:
             conditionedStatus:
               description: A ConditionedStatus reflects the observed status of a resource. Only one condition of each type may exist.

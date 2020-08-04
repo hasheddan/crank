@@ -25,58 +25,40 @@ import (
 
 // +kubebuilder:object:root=true
 
-// Package is the CRD type for a request to add a package to Crossplane.
+// Configuration is the CRD type for a request to add a configuration to Crossplane.
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="READY",type="string",JSONPath=".status.conditionedStatus.conditions[?(@.type=='Ready')].status"
-// +kubebuilder:printcolumn:name="SOURCE",type="string",JSONPath=".spec.source"
 // +kubebuilder:printcolumn:name="PACKAGE",type="string",JSONPath=".spec.package"
 // +kubebuilder:printcolumn:name="AGE",type="date",JSONPath=".metadata.creationTimestamp"
 // +kubebuilder:resource:scope=Cluster,categories={crossplane}
-type Package struct {
+type Configuration struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   PackageSpec   `json:"spec,omitempty"`
-	Status PackageStatus `json:"status,omitempty"`
+	Spec   ConfigurationSpec   `json:"spec,omitempty"`
+	Status ConfigurationStatus `json:"status,omitempty"`
 }
 
-// PackageSpec specifies details about a request to install a package to
-// Crossplane.
-type PackageSpec struct {
-	PackageControllerOptions `json:",inline"`
-
+// ConfigurationSpec specifies details about a request to install a
+// configuration to Crossplane.
+type ConfigurationSpec struct {
 	// Package is the name of the package that is being requested, e.g.,
 	// myapp. Either Package or CustomResourceDefinition can be specified.
 	Package string `json:"package"`
-}
 
-// PackageControllerOptions allow for changes in the Package extraction and
-// deployment controllers. These can affect how images are fetched and how
-// Package derived resources are created.
-type PackageControllerOptions struct {
 	// ImagePullSecrets are named secrets in the same workspace that can be used
-	// to fetch Packages from private repositories and to run controllers from
+	// to fetch Providers from private repositories and to run controllers from
 	// private repositories
 	ImagePullSecrets []corev1.LocalObjectReference `json:"imagePullSecrets,omitempty"`
 
 	// ImagePullPolicy defines the pull policy for all images used during
-	// Package extraction and when running the Package controller.
+	// Provider extraction and when running the Provider controller.
 	// https://kubernetes.io/docs/concepts/configuration/overview/#container-images
 	ImagePullPolicy corev1.PullPolicy `json:"imagePullPolicy,omitempty"`
-
-	// ServiceAccount options allow for changes to the ServiceAccount the
-	// Package Manager creates for the PackageRevision's controller
-	ServiceAccount *ServiceAccountOptions `json:"serviceAccount,omitempty"`
 }
 
-// ServiceAccountOptions augment the ServiceAccount created by the Package
-// controller
-type ServiceAccountOptions struct {
-	Annotations map[string]string `json:"annotations,omitempty"`
-}
-
-// PackageStatus represents the observed state of a Package.
-type PackageStatus struct {
+// ConfigurationStatus represents the observed state of a Configuration.
+type ConfigurationStatus struct {
 	runtimev1alpha1.ConditionedStatus `json:"conditionedStatus,omitempty"`
 
 	CurrentRevision string `json:"currentRevision,omitempty"`
@@ -84,9 +66,35 @@ type PackageStatus struct {
 
 // +kubebuilder:object:root=true
 
-// PackageList contains a list of Package.
-type PackageList struct {
+// ConfigurationList contains a list of Configuration.
+type ConfigurationList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Package `json:"items"`
+	Items           []Configuration `json:"items"`
+}
+
+// +kubebuilder:object:root=true
+
+// A ConfigurationRevision that has been added to Crossplane.
+// +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="READY",type="string",JSONPath=".status.conditionedStatus.conditions[?(@.type=='Ready')].status"
+// +kubebuilder:printcolumn:name="IMAGE",type="string",JSONPath=".spec.image"
+// +kubebuilder:printcolumn:name="STATE",type="string",JSONPath=".spec.desiredState"
+// +kubebuilder:printcolumn:name="AGE",type="date",JSONPath=".metadata.creationTimestamp"
+// +kubebuilder:resource:scope=Cluster,categories={crossplane}
+type ConfigurationRevision struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   PackageRevisionSpec   `json:"spec,omitempty"`
+	Status PackageRevisionStatus `json:"status,omitempty"`
+}
+
+// +kubebuilder:object:root=true
+
+// ConfigurationRevisionList contains a list of ConfigurationRevision.
+type ConfigurationRevisionList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []ConfigurationRevision `json:"items"`
 }

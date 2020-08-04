@@ -20,7 +20,6 @@ import (
 	apps "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbac "k8s.io/api/rbac/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	runtimev1alpha1 "github.com/crossplane/crossplane-runtime/apis/core/v1alpha1"
 )
@@ -36,34 +35,12 @@ const (
 	PackageRevisionInactive PackageRevisionDesiredState = "Inactive"
 )
 
-// +kubebuilder:object:root=true
-
-// A PackageRevision that has been added to Crossplane.
-// +kubebuilder:subresource:status
-// +kubebuilder:printcolumn:name="READY",type="string",JSONPath=".status.conditionedStatus.conditions[?(@.type=='Ready')].status"
-// +kubebuilder:printcolumn:name="IMAGE",type="string",JSONPath=".spec.image"
-// +kubebuilder:printcolumn:name="STATE",type="string",JSONPath=".spec.desiredState"
-// +kubebuilder:printcolumn:name="AGE",type="date",JSONPath=".metadata.creationTimestamp"
-// +kubebuilder:resource:scope=Cluster,categories={crossplane}
-type PackageRevision struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   PackageRevisionSpec   `json:"spec,omitempty"`
-	Status PackageRevisionStatus `json:"status,omitempty"`
-}
-
 // PackageRevisionSpec specifies the desired state of a PackageRevision.
 type PackageRevisionSpec struct {
-	CRDs                       []metav1.TypeMeta           `json:"customresourcedefinitions,omitempty"`
-	InfrastructureDefinitions  []metav1.TypeMeta           `json:"infrastructuredefinitions,omitempty"`
-	InfrastructurePublications []metav1.TypeMeta           `json:"infrastructurepublications,omitempty"`
-	Compositions               []metav1.TypeMeta           `json:"compositions,omitempty"`
-	Controller                 ControllerSpec              `json:"controller,omitempty"`
-	InstallJobRef              *corev1.ObjectReference     `json:"installJobRef,omitempty"`
-	DesiredState               PackageRevisionDesiredState `json:"desiredState"`
-	Image                      string                      `json:"image"`
-	Revision                   int64                       `json:"revision"`
+	InstallJobRef *corev1.ObjectReference     `json:"installJobRef,omitempty"`
+	DesiredState  PackageRevisionDesiredState `json:"desiredState"`
+	Image         string                      `json:"image"`
+	Revision      int64                       `json:"revision"`
 	// DependsOn is the list of packages and CRDs that this package depends on.
 	DependsOn []Dependency `json:"dependsOn,omitempty"`
 }
@@ -98,13 +75,6 @@ type PermissionsSpec struct {
 	Rules []rbac.PolicyRule `json:"rules,omitempty"`
 }
 
-// ContributorSpec defines a contributor for a package (e.g., maintainer, owner,
-// etc.)
-type ContributorSpec struct {
-	Name  string `json:"name,omitempty"`
-	Email string `json:"email,omitempty"`
-}
-
 // ControllerDeployment defines a controller for a package that is managed by a
 // Deployment.
 type ControllerDeployment struct {
@@ -116,13 +86,4 @@ type ControllerDeployment struct {
 type PackageRevisionStatus struct {
 	runtimev1alpha1.ConditionedStatus `json:"conditionedStatus,omitempty"`
 	ControllerRef                     *corev1.ObjectReference `json:"controllerRef,omitempty"`
-}
-
-// +kubebuilder:object:root=true
-
-// PackageRevisionList contains a list of Package.
-type PackageRevisionList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Package `json:"items"`
 }

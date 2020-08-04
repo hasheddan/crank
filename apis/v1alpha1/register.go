@@ -37,20 +37,36 @@ var (
 	SchemeBuilder = &scheme.Builder{GroupVersion: SchemeGroupVersion}
 )
 
-// Package type metadata.
+// Configuation type metadata.
 var (
-	PackageKind             = reflect.TypeOf(Package{}).Name()
-	PackageGroupKind        = schema.GroupKind{Group: Group, Kind: PackageKind}.String()
-	PackageKindAPIVersion   = PackageKind + "." + SchemeGroupVersion.String()
-	PackageGroupVersionKind = SchemeGroupVersion.WithKind(PackageKind)
+	ConfigurationKind             = reflect.TypeOf(Configuration{}).Name()
+	ConfigurationGroupKind        = schema.GroupKind{Group: Group, Kind: ConfigurationKind}.String()
+	ConfigurationKindAPIVersion   = ConfigurationKind + "." + SchemeGroupVersion.String()
+	ConfigurationGroupVersionKind = SchemeGroupVersion.WithKind(ConfigurationKind)
 )
 
-// PackageRevision type metadata.
+// ConfigurationRevision type metadata.
 var (
-	PackageRevisionKind             = reflect.TypeOf(PackageRevision{}).Name()
-	PackageRevisionGroupKind        = schema.GroupKind{Group: Group, Kind: PackageRevisionKind}.String()
-	PackageRevisionKindAPIVersion   = PackageRevisionKind + "." + SchemeGroupVersion.String()
-	PackageRevisionGroupVersionKind = SchemeGroupVersion.WithKind(PackageRevisionKind)
+	ConfigurationRevisionKind             = reflect.TypeOf(ConfigurationRevision{}).Name()
+	ConfigurationRevisionGroupKind        = schema.GroupKind{Group: Group, Kind: ConfigurationRevisionKind}.String()
+	ConfigurationRevisionKindAPIVersion   = ConfigurationRevisionKind + "." + SchemeGroupVersion.String()
+	ConfigurationRevisionGroupVersionKind = SchemeGroupVersion.WithKind(ConfigurationRevisionKind)
+)
+
+// Provider type metadata.
+var (
+	ProviderKind             = reflect.TypeOf(Provider{}).Name()
+	ProviderGroupKind        = schema.GroupKind{Group: Group, Kind: ProviderKind}.String()
+	ProviderKindAPIVersion   = ProviderKind + "." + SchemeGroupVersion.String()
+	ProviderGroupVersionKind = SchemeGroupVersion.WithKind(ProviderKind)
+)
+
+// ProviderRevision type metadata.
+var (
+	ProviderRevisionKind             = reflect.TypeOf(ProviderRevision{}).Name()
+	ProviderRevisionGroupKind        = schema.GroupKind{Group: Group, Kind: ProviderRevisionKind}.String()
+	ProviderRevisionKindAPIVersion   = ProviderRevisionKind + "." + SchemeGroupVersion.String()
+	ProviderRevisionGroupVersionKind = SchemeGroupVersion.WithKind(ProviderRevisionKind)
 )
 
 // PackageLock type metadata.
@@ -62,7 +78,9 @@ var (
 )
 
 func init() {
-	SchemeBuilder.Register(&Package{}, &PackageList{})
-	SchemeBuilder.Register(&PackageRevision{}, &PackageRevisionList{})
+	SchemeBuilder.Register(&Configuration{}, &ConfigurationList{})
+	SchemeBuilder.Register(&ConfigurationRevision{}, &ConfigurationRevisionList{})
+	SchemeBuilder.Register(&Provider{}, &ProviderList{})
+	SchemeBuilder.Register(&ProviderRevision{}, &ProviderRevisionList{})
 	SchemeBuilder.Register(&PackageLock{}, &PackageLockList{})
 }
