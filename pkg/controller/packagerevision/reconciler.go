@@ -44,16 +44,42 @@ const (
 	aShortWait = 30 * time.Second
 )
 
+// ReconcilerOption is used to configure the Reconciler.
+type ReconcilerOption func(*Reconciler)
+
+// WithNewPackageRevisionFn determines the type of package being reconciled.
+func WithNewPackageRevisionFn(f func() v1alpha1.PackageRevision) ReconcilerOption {
+	return func(r *Reconciler) {
+		r.newPackageRevision = f
+	}
+}
+
+// WithLogger specifies how the Reconciler should log messages.
+func WithLogger(log logging.Logger) ReconcilerOption {
+	return func(r *Reconciler) {
+		r.log = log
+	}
+}
+
+// WithRecorder specifies how the Reconciler should record Kubernetes events.
+func WithRecorder(er event.Recorder) ReconcilerOption {
+	return func(r *Reconciler) {
+		r.record = er
+	}
+}
+
 // Reconciler reconciles package revisions.
 type Reconciler struct {
 	client resource.ClientApplicator
 	log    logging.Logger
 	record event.Recorder
+
+	newPackageRevision func() v1alpha1.PackageRevision
 }
 
-// Setup adds a controller that reconciles PackageRevisions.
-func Setup(mgr ctrl.Manager, l logging.Logger) error {
-	name := "packages/" + strings.ToLower(v1alpha1.PackageRevisionGroupKind)
+// SetupProviderRevision adds a controller that reconciles ProviderRevisions.
+func SetupProviderRevision(mgr ctrl.Manager, l logging.Logger) error {
+	name := "packages/" + strings.ToLower(v1alpha1.ProviderRevisionGroupKind)
 
 	r := &Reconciler{
 		client: resource.ClientApplicator{
@@ -61,13 +87,50 @@ func Setup(mgr ctrl.Manager, l logging.Logger) error {
 			Applicator: resource.NewAPIPatchingApplicator(mgr.GetClient()),
 		},
 		log:    l.WithValues("controller", name),
-		record: event.NewAPIRecorder(mgr.GetEventRecorderFor("packagerevision")),
+		record: event.NewAPIRecorder(mgr.GetEventRecorderFor("providerrevision")),
 	}
 
 	return ctrl.NewControllerManagedBy(mgr).
 		Named(name).
-		For(&v1alpha1.PackageRevision{}).
+		For(&v1alpha1.ProviderRevision{}).
 		Complete(r)
+}
+
+// SetupConfigurationRevision adds a controller that reconciles ConfigurationRevisions.
+func SetupConfigurationRevision(mgr ctrl.Manager, l logging.Logger) error {
+	name := "packages/" + strings.ToLower(v1alpha1.ConfigurationRevisionGroupKind)
+
+	r := &Reconciler{
+		client: resource.ClientApplicator{
+			Client:     mgr.GetClient(),
+			Applicator: resource.NewAPIPatchingApplicator(mgr.GetClient()),
+		},
+		log:    l.WithValues("controller", name),
+		record: event.NewAPIRecorder(mgr.GetEventRecorderFor("configurationrevision")),
+	}
+
+	return ctrl.NewControllerManagedBy(mgr).
+		Named(name).
+		For(&v1alpha1.ConfigurationRevision{}).
+		Complete(r)
+}
+
+// NewReconciler creates a new package reconciler.
+func NewReconciler(mgr ctrl.Manager, opts ...ReconcilerOption) *Reconciler {
+	r := &Reconciler{
+		client: resource.ClientApplicator{
+			Client:     mgr.GetClient(),
+			Applicator: resource.NewAPIPatchingApplicator(mgr.GetClient()),
+		},
+		log:    logging.NewNopLogger(),
+		record: event.NewNopRecorder(),
+	}
+
+	for _, f := range opts {
+		f(r)
+	}
+
+	return r
 }
 
 // Reconcile package revision.
@@ -78,40 +141,40 @@ func (r *Reconciler) Reconcile(req reconcile.Request) (reconcile.Result, error) 
 	ctx, cancel := context.WithTimeout(context.Background(), reconcileTimeout)
 	defer cancel()
 
-	p := &v1alpha1.PackageRevision{}
-	if err := r.client.Get(ctx, req.NamespacedName, p); err != nil {
+	pr := r.newPackageRevision()
+	if err := r.client.Get(ctx, req.NamespacedName, pr); err != nil {
 		// There's no need to requeue if we no longer exist. Otherwise we'll be
 		// requeued implicitly because we return an error.
 		log.Debug("Cannot get package revision", "error", err)
 		return reconcile.Result{}, errors.Wrap(resource.IgnoreNotFound(err), "cannot get PackageRevision")
 	}
 
-	crds, _, _, err := unpack.Resources(p.Spec.Image)
+	crds, _, _, err := unpack.Resources(pr.GetSource())
 	if err != nil {
 		log.Debug("Cannot unpack resources", "error", err)
 		return reconcile.Result{RequeueAfter: aShortWait}, errors.Wrap(err, "cannot unpack PackageRevision resources")
 	}
 
 	for _, c := range crds {
-		if p.Spec.DesiredState == v1alpha1.PackageRevisionInactive {
-			meta.AddOwnerReference(&c, meta.AsOwner(meta.ReferenceTo(p, v1alpha1.PackageRevisionGroupVersionKind)))
-			if err := r.client.Applicator.Apply(ctx, &c, ownerReferenceApplicator(meta.AsOwner(meta.ReferenceTo(p, v1alpha1.PackageRevisionGroupVersionKind)))); err != nil {
+		if pr.GetDesiredState() == v1alpha1.PackageRevisionInactive {
+			meta.AddOwnerReference(&c, meta.AsOwner(meta.ReferenceTo(pr, pr.GetObjectKind().GroupVersionKind())))
+			if err := r.client.Applicator.Apply(ctx, &c, ownerReferenceApplicator(meta.AsOwner(meta.ReferenceTo(pr, pr.GetObjectKind().GroupVersionKind())))); err != nil {
 				log.Debug("Cannot apply crds", "error", "crd", c.Name, err)
-				p.Status.SetConditions(runtimev1alpha1.Unavailable(), runtimev1alpha1.ReconcileSuccess())
-				return reconcile.Result{RequeueAfter: aShortWait}, errors.Wrap(r.client.Status().Update(ctx, p), "cannot update package status")
+				pr.SetConditions(runtimev1alpha1.Unavailable(), runtimev1alpha1.ReconcileSuccess())
+				return reconcile.Result{RequeueAfter: aShortWait}, errors.Wrap(r.client.Status().Update(ctx, pr), "cannot update package status")
 			}
 		} else {
-			meta.AddOwnerReference(&c, meta.AsController(meta.ReferenceTo(p, v1alpha1.PackageRevisionGroupVersionKind)))
-			if err := r.client.Applicator.Apply(ctx, &c, resource.MustBeControllableBy(p.UID), ownerReferenceApplicator(meta.AsController(meta.ReferenceTo(p, v1alpha1.PackageRevisionGroupVersionKind)))); err != nil {
+			meta.AddOwnerReference(&c, meta.AsController(meta.ReferenceTo(pr, pr.GetObjectKind().GroupVersionKind())))
+			if err := r.client.Applicator.Apply(ctx, &c, resource.MustBeControllableBy(pr.GetUID()), ownerReferenceApplicator(meta.AsController(meta.ReferenceTo(pr, pr.GetObjectKind().GroupVersionKind())))); err != nil {
 				log.Debug("Cannot apply crds", "error", "crd", c.Name, err)
-				p.Status.SetConditions(runtimev1alpha1.Unavailable(), runtimev1alpha1.ReconcileSuccess())
-				return reconcile.Result{RequeueAfter: aShortWait}, errors.Wrap(r.client.Status().Update(ctx, p), "cannot update package status")
+				pr.SetConditions(runtimev1alpha1.Unavailable(), runtimev1alpha1.ReconcileSuccess())
+				return reconcile.Result{RequeueAfter: aShortWait}, errors.Wrap(r.client.Status().Update(ctx, pr), "cannot update package status")
 			}
 		}
 	}
 
-	p.Status.SetConditions(runtimev1alpha1.Available(), runtimev1alpha1.ReconcileSuccess())
-	return reconcile.Result{RequeueAfter: aShortWait}, errors.Wrap(r.client.Status().Update(ctx, p), "cannot update package status")
+	pr.SetConditions(runtimev1alpha1.Available(), runtimev1alpha1.ReconcileSuccess())
+	return reconcile.Result{RequeueAfter: aShortWait}, errors.Wrap(r.client.Status().Update(ctx, pr), "cannot update package status")
 }
 
 // TODO(hasheddan): pretty sure there is a cleaner way to do this

@@ -28,8 +28,10 @@ import (
 // Setup workload controllers.
 func Setup(mgr ctrl.Manager, l logging.Logger) error {
 	for _, setup := range []func(ctrl.Manager, logging.Logger) error{
-		manager.Setup,
-		packagerevision.Setup,
+		manager.SetupProvider,
+		manager.SetupConfiguration,
+		packagerevision.SetupProviderRevision,
+		packagerevision.SetupConfigurationRevision,
 	} {
 		if err := setup(mgr, l); err != nil {
 			return err
