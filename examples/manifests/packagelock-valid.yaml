@@ -1,5 +1,5 @@
 apiVersion: crank.crossplane.io/v1alpha1
-kind: Module
+kind: PackageLock
 metadata:
   name: packages
 spec:
@@ -15,5 +15,3 @@ spec:
     - test-3-image
   - name: test-3
     image: test-3-image
-    dependencies:
-    - test-2-image
