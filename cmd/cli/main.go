@@ -14,30 +14,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package cmd
+package main
 
 import (
-	"github.com/hasheddan/crank/cmd/cli"
+	"github.com/hasheddan/crank/cmd/cli/configurations"
 	"github.com/hasheddan/crank/cmd/cli/packages"
-	"github.com/hasheddan/crank/cmd/manager"
+	"github.com/hasheddan/crank/cmd/cli/providers"
 	"github.com/spf13/cobra"
 )
 
-var (
-	rootCmd = &cobra.Command{
-		Use:   "crank",
-		Short: "The next generation package manager for Crossplane",
-		Long:  `The next generation package manager for Crossplane`,
-	}
-)
-
-// Execute executes the root command.
-func Execute() error {
-	return rootCmd.Execute()
+// Root is the Crank CLI root command.
+var Root = &cobra.Command{
+	Use:   "crank",
+	Short: "The next generation package manager for Crossplane",
+	Long:  `The next generation package manager for Crossplane`,
 }
 
 func init() {
-	rootCmd.AddCommand(manager.Root)
-	rootCmd.AddCommand(cli.Lint)
-	rootCmd.AddCommand(packages.Root)
+	Root.AddCommand(configurations.Root)
+	Root.AddCommand(packages.Root)
+	Root.AddCommand(providers.Root)
+}
+
+func main() {
+	Root.Execute()
 }
