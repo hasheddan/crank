@@ -17,9 +17,22 @@ limitations under the License.
 package main
 
 import (
-	"github.com/hasheddan/crank/cmd"
+	"github.com/hasheddan/crank/cmd/controller/manager"
+	"github.com/spf13/cobra"
 )
 
+var (
+	rootCmd = &cobra.Command{
+		Use:   "crank",
+		Short: "The next generation package manager for Crossplane",
+		Long:  `The next generation package manager for Crossplane`,
+	}
+)
+
+func init() {
+	rootCmd.AddCommand(manager.Root)
+}
+
 func main() {
-	cmd.Execute()
+	rootCmd.Execute()
 }
