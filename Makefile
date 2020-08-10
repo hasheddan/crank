@@ -21,7 +21,7 @@ delete-cluster:
 	kind delete cluster --name=crank
 
 manager:
-	go run main.go manager
+	go run cmd/controller/main.go manager
 
 generate:
 	go generate ./...
