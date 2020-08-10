@@ -101,7 +101,13 @@ func Resources(image string) ([]apiextensions.CustomResourceDefinition, []apiv1a
 	crds := []apiextensions.CustomResourceDefinition{}
 	infraDefs := []apiv1alpha1.InfrastructureDefinition{}
 	comps := []apiv1alpha1.Composition{}
-	if err = afero.Walk(fs, ".registry", func(path string, _ os.FileInfo, err error) error {
+	if err = afero.Walk(fs, ".registry", func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
 		b, err := afero.ReadFile(fs, path)
 		if err != nil {
 			return err
@@ -112,12 +118,12 @@ func Resources(image string) ([]apiextensions.CustomResourceDefinition, []apiv1a
 			return nil
 		}
 		id := &apiv1alpha1.InfrastructureDefinition{}
-		if err := yaml.Unmarshal(b, id); err == nil {
+		if err := yaml.Unmarshal(b, id); err == nil && id.Kind == "InfrastructureDefinition" {
 			infraDefs = append(infraDefs, *id)
 			return nil
 		}
 		comp := &apiv1alpha1.Composition{}
-		if err := yaml.Unmarshal(b, comp); err == nil {
+		if err := yaml.Unmarshal(b, comp); err == nil && comp.Kind == "Composition" {
 			comps = append(comps, *comp)
 			return nil
 		}
