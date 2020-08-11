@@ -121,8 +121,8 @@ func SetupConfiguration(mgr ctrl.Manager, l logging.Logger) error {
 
 	return ctrl.NewControllerManagedBy(mgr).
 		Named(name).
-		For(&v1alpha1.Provider{}).
-		Owns(&v1alpha1.ProviderRevision{}).
+		For(&v1alpha1.Configuration{}).
+		Owns(&v1alpha1.ConfigurationRevision{}).
 		Complete(r)
 }
 
