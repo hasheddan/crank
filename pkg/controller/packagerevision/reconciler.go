@@ -81,14 +81,13 @@ type Reconciler struct {
 func SetupProviderRevision(mgr ctrl.Manager, l logging.Logger) error {
 	name := "packages/" + strings.ToLower(v1alpha1.ProviderRevisionGroupKind)
 
-	r := &Reconciler{
-		client: resource.ClientApplicator{
-			Client:     mgr.GetClient(),
-			Applicator: resource.NewAPIPatchingApplicator(mgr.GetClient()),
-		},
-		log:    l.WithValues("controller", name),
-		record: event.NewAPIRecorder(mgr.GetEventRecorderFor("providerrevision")),
-	}
+	nr := func() v1alpha1.PackageRevision { return &v1alpha1.ProviderRevision{} }
+
+	r := NewReconciler(mgr,
+		WithNewPackageRevisionFn(nr),
+		WithLogger(l.WithValues("controller", name)),
+		WithRecorder(event.NewAPIRecorder(mgr.GetEventRecorderFor("providerrevision"))),
+	)
 
 	return ctrl.NewControllerManagedBy(mgr).
 		Named(name).
@@ -100,14 +99,13 @@ func SetupProviderRevision(mgr ctrl.Manager, l logging.Logger) error {
 func SetupConfigurationRevision(mgr ctrl.Manager, l logging.Logger) error {
 	name := "packages/" + strings.ToLower(v1alpha1.ConfigurationRevisionGroupKind)
 
-	r := &Reconciler{
-		client: resource.ClientApplicator{
-			Client:     mgr.GetClient(),
-			Applicator: resource.NewAPIPatchingApplicator(mgr.GetClient()),
-		},
-		log:    l.WithValues("controller", name),
-		record: event.NewAPIRecorder(mgr.GetEventRecorderFor("configurationrevision")),
-	}
+	nr := func() v1alpha1.PackageRevision { return &v1alpha1.ConfigurationRevision{} }
+
+	r := NewReconciler(mgr,
+		WithNewPackageRevisionFn(nr),
+		WithLogger(l.WithValues("controller", name)),
+		WithRecorder(event.NewAPIRecorder(mgr.GetEventRecorderFor("configurationrevision"))),
+	)
 
 	return ctrl.NewControllerManagedBy(mgr).
 		Named(name).
